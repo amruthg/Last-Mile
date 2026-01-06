@@ -1,0 +1,15 @@
+1 . minikube start
+2 . Run jenkins pipeline ( checkout → venv setup → tests → Bandit/Gitleaks/pip-audit → 
+      build images → Trivy scan → push images → `kubectl apply` + `set image` in `default` namespace. Green build indicates deploy succeeded.
+3. kubectl config set-context --current --namespace=lastmile
+4. kubectl get pods -w (live view of pods)
+5.  kubectl port-forward svc/gateway 5000:5000
+6.  minikube service frontend -n lastmile
+7.  kubectl get hpa -w
+8.  kubectl port-forward svc/matching-svc 50057:50057 &
+python3 scripts/load_gen.py  (for hpa demo with matching service)
+9.  kubectl delete pod -l app=station-svc (for fault tolerance demo)
+10.  kubectl port-forward svc/kibana 5601:5601 ( Access Kibana - Login with Username: `elastic` Password: `password123`)
+
+Expected: Filebeat ships container logs; discover index `filebeat-*` in Kibana and see  logs.
+
