@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana
+spec:
+  selector:
+    app: kibana
+  ports:
+  - name: http
+    port: 5601
+    targetPort: 5601
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+      - name: kibana
+        image: docker.io/library/kibana:8.12.2
+        env:
+        - name: ELASTICSEARCH_HOSTS
+          value: "http://elasticsearch:9200"
+        - name: ELASTICSEARCH_SSL_VERIFICATIONMODE
+          value: "none"
+        - name: ELASTICSEARCH_USERNAME
+          value: "kibana_system"
+        - name: ELASTICSEARCH_PASSWORD
+          value: "0iLzs7a6wqrLjaPGAtC1"
+        ports:
+        - containerPort: 5601
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"

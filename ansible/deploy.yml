@@ -1,0 +1,33 @@
+
+---
+- name: Deploy LastMile Application
+  hosts: localhost
+  connection: local
+  roles:
+    - role: playbooks/roles/kubectl-setup
+      when: manage_minikube | default(true) | bool
+    
+    - role: playbooks/roles/k8s-namespace
+    
+    - role: playbooks/roles/k8s-secrets
+    
+    - role: playbooks/roles/k8s-pre-deploy
+    
+    - role: playbooks/roles/app-deploy
+    
+    - role: playbooks/roles/elk-deploy
+    
+    - role: playbooks/roles/k8s-update-images
+      when: deploy_services is defined and deploy_services != ''
+  
+  tasks:
+    - name: Check if Minikube is running
+      command: minikube status
+      register: minikube_check
+      ignore_errors: yes
+      when: manage_minikube | default(true) | bool
+
+    - name: Delete Minikube if not running or misconfigured
+      command: minikube delete
+      when: (manage_minikube | default(true) | bool) and (minikube_check.rc is defined and minikube_check.rc != 0)
+
